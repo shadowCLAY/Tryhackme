@@ -1,0 +1,18 @@
+ssh tryhackme@ip
+
+su user2
+
+/etc
+  shadow passwd sudoers sudoers.d
+
+
+/var
+  backups log opt tmp
+  
+  
+/root
+  myfile myfolder passwords.xlsx
+  
+  
+/tmp
+  todelete trash.txt rubbish.bin
