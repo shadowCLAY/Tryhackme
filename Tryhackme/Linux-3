@@ -1,0 +1,212 @@
+              *****************************************Transferring Files From Your Host - SCP (SSH)*****************************************
+
+
+Bản sao an toàn hay còn gọi là SCP - một phương tiện sao chép các tệp một cách an toàn. Không giống như lệnh cp thông thường, 
+lệnh này cho phép bạn chuyển tệp giữa hai máy tính bằng giao thức SSH để cung cấp cả xác thực và mã hóa.
+
+Làm việc trên mô hình NGUỒN và ĐIỂM ĐẾN, SCP cho phép bạn:
+
+    Sao chép tệp & thư mục từ hệ thống hiện tại của bạn sang hệ thống từ xa
+    Sao chép tệp & thư mục từ hệ thống từ xa sang hệ thống hiện tại của bạn
+
+Với điều kiện chúng tôi biết tên người dùng và mật khẩu của người dùng trên hệ thống hiện tại của bạn và người dùng trên hệ thống từ xa. 
+Ví dụ: hãy sao chép một tệp ví dụ từ máy của chúng tôi sang một máy từ xa, tôi đã trình bày gọn gàng trong bảng dưới đây:
+
+              The IP address of the remote system 	                                    192.168.1.30
+              User on the remote system	                                                ubuntu
+              Name of the file on the local system	                                    important.txt
+              Name that we wish to store the file as on the remote system	              transferred.txt
+              
+              
+Với thông tin này, hãy tạo lệnh scp của chúng ta (hãy nhớ rằng định dạng của SCP chỉ là NGUỒN và ĐIỂM ĐẾN)
+                  scp important.txt ubuntu@192.168.1.30:/home/ubuntu/transferred.txt
+                  
+                  
+                  
+                  
+Và bây giờ hãy đảo ngược điều này và bố cục cú pháp để sử dụng scp để sao chép tệp từ máy tính từ xa mà chúng ta chưa đăng nhập
+  
+              Variable	                                                                          Value
+         IP address of the remote system	                                                    192.168.1.30
+         User on the remote system	                                                              ubuntu
+         Name of the file on the remote system	                                              documents.txt
+         Name that we wish to store the file as on our system	                                notes.txt
+         
+
+
+scp ubuntu@192.168.1.30:/home/ubuntu/documents.txt notes.txt  
+
+
+
+
+
+
+              *****************************************Serving Files From Your Host - WEB*****************************************
+              
+              
+HTTPServer" của Python3 sẽ phục vụ các tệp trong thư mục mà bạn chạy lệnh, nhưng điều này có thể được thay đổi bằng cách
+cung cấp các tùy chọn có thể tìm thấy trong các trang hướng dẫn. 
+Đơn giản, tất cả những gì chúng ta cần làm là chạy python3 -m http.server để khởi động mô-đun! 
+
+Trong ảnh chụp màn hình bên dưới, chúng tôi đang phục vụ từ một thư mục được gọi là
+"máy chủ web", có một tệp duy nhất được đặt tên là "tệp".
+
+
+
+            Using Python to start a web server
+tryhackme@linux3:/tmp# python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+
+        
+Downloading a file from our webserver using wget 
+      tryhackme@linux3:/tmp# wget http://127.0.0.1:8000/file
+      
+      
+Trong ảnh chụp màn hình ở trên, chúng ta có thể thấy rằng wget đã tải xuống thành công tệp có tên "tệp" vào máy của chúng tôi. 
+Yêu cầu này được SimpleHTTPServer ghi lại giống như bất kỳ máy chủ web nào, mà tôi đã ghi lại trong ảnh chụp màn hình bên dưới.
+                 
+        tryhackme@linux3:/tmp# python3 -m http.server
+        Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+        127.0.0.1 - - [04/May/2021/14:26:09] "GET /file HTTP/1.1" 200 -
+
+        
+
+
+
+
+
+              *****************************************How do Processes Start?*****************************************
+              
+              
+              
+Hãy bắt đầu bằng cách nói về không gian tên. 
+Hệ điều hành (OS) sử dụng không gian tên để cuối cùng phân chia tài nguyên có sẵn trên máy tính cho các quy trình 
+(chẳng hạn như CPU, RAM và ưu tiên). 
+Hãy coi nó giống như việc chia máy tính của bạn thành từng lát - tương tự như một chiếc bánh. 
+Các quy trình trong phần đó sẽ có quyền truy cập vào một lượng sức mạnh tính toán nhất định, tuy nhiên, 
+nó sẽ là một phần nhỏ của những gì thực sự có sẵn cho mọi quy trình nói chung.
+
+Không gian tên rất tốt cho bảo mật vì nó là một cách để cô lập các quy trình 
+với một quy trình khác - chỉ những quy trình nằm trong cùng một không gian tên mới có thể nhìn thấy nhau.
+
+Trước đây chúng ta đã nói về cách PID hoạt động và đây là lúc nó phát huy tác dụng.
+Quá trình có ID là 0 là quá trình được bắt đầu khi hệ thống khởi động. 
+Quy trình này là init của hệ thống trên Ubuntu, chẳng hạn như systemd, 
+được sử dụng để cung cấp cách quản lý các quy trình của người dùng và nằm giữa hệ điều hành và người dùng.
+
+Ví dụ, sau khi hệ thống khởi động và khởi động, systemd là một trong những quy trình đầu tiên được bắt đầu. 
+Bất kỳ chương trình hoặc phần mềm nào mà chúng ta muốn bắt đầu sẽ bắt đầu dưới dạng quy trình con của systemd. 
+Điều này có nghĩa là nó được kiểm soát bởi systemd, nhưng sẽ chạy như một quy trình của riêng nó 
+(mặc dù chia sẻ tài nguyên từ systemd) để giúp chúng tôi dễ dàng xác định và thích.
+
+
+
+                        *****************************************Getting Processes/Services to Start on Boot*****************************************
+
+Một số ứng dụng có thể được khởi động khi khởi động hệ thống mà chúng tôi sở hữu. 
+Ví dụ, máy chủ web, máy chủ cơ sở dữ liệu hoặc máy chủ truyền tệp. 
+Phần mềm này thường rất quan trọng và thường được quản trị viên yêu cầu khởi động trong quá trình khởi động hệ thống.
+
+Trong ví dụ này, chúng ta sẽ yêu cầu máy chủ web apache khởi động apache theo cách thủ công 
+và sau đó yêu cầu hệ thống khởi chạy apache2 khi khởi động.
+
+
+
+
+
+
+
+
+
+             *****************************************An Introduction to Backgrounding and Foregrounding in Linux****************************************
+
+
+Các quá trình có thể chạy ở hai trạng thái: Trong nền và ở phía trước. 
+Ví dụ: các lệnh mà bạn chạy trong thiết bị đầu cuối của mình như "echo" hoặc những thứ 
+thuộc loại đó sẽ chạy ở nền trước của thiết bị đầu cuối vì đó là lệnh duy nhất được cung cấp không được yêu cầu chạy trong nền. 
+"Echo" là một ví dụ tuyệt vời vì đầu ra của tiếng vọng sẽ quay trở lại bạn ở phía trước, 
+nhưng không ở phía sau - ví dụ: hãy lấy ảnh chụp màn hình bên dưới.
+
+
+
+
+
+
+
+
+
+
+             *****************************************Introducing Packages & Software Repos****************************************
+             
+             
+             
+Khi các nhà phát triển muốn gửi phần mềm đến cộng đồng, họ sẽ gửi phần mềm đó đến một kho lưu trữ "apt". 
+Nếu được chấp thuận, các chương trình và công cụ của họ sẽ được phát hành tự nhiên. 
+
+Hai trong số những tính năng đáng chú ý nhất của Linux được chiếu sáng ở đây: 
+Khả năng truy cập của người dùng và giá trị của các công cụ nguồn mở.
+
+Khi sử dụng lệnh ls trên máy Linux Ubuntu 20.04, các tệp này đóng vai trò là cổng / đăng ký.
+
+
+
+
+
+
+
+
+
+
+
+
+             *****************************************Managing Your Repositories (Adding and Removing)****************************************
+
+
+
+Thông thường, chúng tôi sử dụng lệnh apt để cài đặt phần mềm vào hệ thống Ubuntu của chúng tôi. 
+Lệnh apt là một phần của phần mềm quản lý gói còn có tên là apt. 
+Apt chứa toàn bộ bộ công cụ cho phép chúng tôi quản lý các gói và nguồn phần mềm của mình, đồng thời cài đặt hoặc gỡ bỏ phần mềm.
+
+Hãy xem qua việc thêm và xóa kho lưu trữ bằng cách sử dụng lệnh add-apt-repository mà chúng tôi đã minh họa ở trên. 
+Mặc dù bạn có thể cài đặt phần mềm thông qua việc sử dụng các trình cài đặt gói như dpkg, 
+nhưng lợi ích của apt có nghĩa là bất cứ khi nào chúng tôi cập nhật hệ thống của mình - 
+kho chứa các phần mềm mà chúng tôi thêm vào cũng được kiểm tra các bản cập nhật.
+
+Trong ví dụ này, chúng tôi sẽ thêm trình soạn thảo văn bản Sublime Text vào máy Ubuntu của chúng tôi như một kho lưu trữ 
+vì nó không phải là một phần của kho lưu trữ Ubuntu mặc định. Khi thêm phần mềm, 
+tính toàn vẹn của những gì chúng tôi tải xuống được đảm bảo bằng cách sử dụng các khóa GPG (Gnu Privacy Guard). 
+Các khóa này về cơ bản là một kiểm tra an toàn từ các nhà phát triển nói rằng, "đây là phần mềm của chúng tôi". 
+Nếu các khóa không khớp với những gì hệ thống của bạn tin tưởng và những gì nhà phát triển đã sử dụng, thì phần mềm sẽ không được tải xuống.
+
+
+
+
+
+
+
+
+
+
+             *****************************************Maintaining Your System: Logs ****************************************
+
+
+
+
+Chúng tôi đã đề cập ngắn gọn đến các tệp nhật ký và nơi chúng có thể được tìm thấy trong Các nguyên tắc cơ bản của Linux Phần 1. Tuy nhiên, chúng ta hãy nhanh chóng tóm tắt lại. Nằm trong thư mục / var / log, các tệp và thư mục này chứa thông tin ghi nhật ký cho các ứng dụng và dịch vụ đang chạy trên hệ thống của bạn. Hệ điều hành (OS) đã trở nên khá tốt trong việc tự động quản lý các nhật ký này trong một quá trình được gọi là "luân phiên".
+
+Tôi đã đánh dấu một số nhật ký từ ba dịch vụ chạy trên máy Ubuntu:
+
+    Máy chủ web Apache2
+    Ví dụ: nhật ký cho dịch vụ fail2ban, được sử dụng để theo dõi các hành động vũ phu đã cố gắng
+    Dịch vụ UFW được sử dụng làm tường lửa
+
+
+Các dịch vụ và nhật ký này là một cách tuyệt vời để theo dõi tình trạng hệ thống của bạn và bảo vệ nó. Không chỉ vậy, nhật ký cho các dịch vụ như máy chủ web chứa thông tin về mọi yêu cầu đơn lẻ - cho phép các nhà phát triển hoặc quản trị viên chẩn đoán các vấn đề về hiệu suất hoặc điều tra hoạt động của kẻ xâm nhập. Ví dụ: hai loại tệp nhật ký dưới đây được quan tâm:
+
+    nhật ký truy cập
+    nhật ký lỗi
+    
+    
+Tất nhiên, có các bản ghi lưu trữ thông tin về cách hệ điều hành tự chạy và 
+các hành động được thực hiện bởi người dùng, chẳng hạn như các lần xác thực.
+
